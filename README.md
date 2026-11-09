@@ -1,5 +1,7 @@
 # FitPilot
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/fdd064ee-ca14-4561-b383-cfe0a95e4400/deploy-status)](https://app.netlify.com/projects/lucky-sawine-580f93/deploys)
+
 An adaptive personal fitness coach: plan → exercise → record → eat → analyse → adapt.
 Built as an installable, offline-capable web app (PWA) with React + TypeScript. All data stays on the device.
 
