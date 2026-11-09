@@ -8,6 +8,7 @@ import { Icon, Seg, Sheet, Switch, toast } from '../ui/kit';
 import { go } from '../ui/nav';
 import { DIETS, EQUIPMENT, EXPERIENCE, GOALS } from './Onboarding';
 import { requestNotificationPermission } from '../lib/reminders';
+import { CloudPanel } from '../ui/CloudPanel';
 
 const HOSTED = import.meta.env.VITE_HOSTED === '1';
 
@@ -118,9 +119,11 @@ export default function Settings() {
           {state.ai.apiKey && <button className="btn sm danger" onClick={() => { setKey(''); setState((s) => ({ ...s, ai: { ...s.ai, apiKey: '' } })); toast('API key removed'); }}>Remove key</button>}
         </div>}
 
+        <CloudPanel />
+
         <div className="card">
           <div className="label">Your data</div>
-          <p className="small muted">All fitness and nutrition data is stored only on this device. FitPilot has no accounts and never shares your information with other users.</p>
+          <p className="small muted">Your data is stored on this device, plus your private cloud backup if you've signed in above. It is never shared with other users.</p>
           <button className="btn" onClick={download}>Export my data (JSON)</button>
           <input ref={fileRef} type="file" accept="application/json" hidden onChange={async (e) => { const f = e.target.files?.[0]; if (!f) return; const err = importData(await f.text()); toast(err ?? 'Data imported'); }} />
           <button className="btn" onClick={() => fileRef.current?.click()}>Import from export…</button>

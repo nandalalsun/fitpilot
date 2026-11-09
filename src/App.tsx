@@ -9,6 +9,8 @@ import Progress from './screens/Progress';
 import Settings from './screens/Settings';
 import Workout from './screens/Workout';
 import { Icon, toast, ToastHost } from './ui/kit';
+import { autoStartCloud } from './lib/cloud';
+import { CloudChoice } from './ui/CloudPanel';
 import { go, useNav, type Tab } from './ui/nav';
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
@@ -33,6 +35,7 @@ export default function App() {
         if (!shown) toast(`${r.title} — ${r.body}`);
       }
     };
+    autoStartCloud();
     tick();
     const id = setInterval(tick, 60_000);
     const vis = () => document.visibilityState === 'visible' && refreshSchedule();
@@ -40,7 +43,7 @@ export default function App() {
     return () => { clearInterval(id); document.removeEventListener('visibilitychange', vis); };
   }, []);
 
-  if (!hasProfile) return <><Onboarding /><ToastHost /></>;
+  if (!hasProfile) return <><Onboarding /><CloudChoice /><ToastHost /></>;
 
   return (
     <div className="app">
@@ -60,6 +63,7 @@ export default function App() {
           ))}
         </div>
       </nav>
+      <CloudChoice />
       <ToastHost />
     </div>
   );

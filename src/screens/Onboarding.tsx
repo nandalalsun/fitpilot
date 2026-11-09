@@ -5,6 +5,8 @@ import { ensureSchedule } from '../lib/training';
 import type { Equipment, Experience, Gender, Goal, Profile, SplitType } from '../lib/types';
 import { DAY_SHORT, KG_PER_LB, todayISO } from '../lib/util';
 import { Seg } from '../ui/kit';
+import { cloudSignIn, useCloud } from '../lib/cloud';
+import { SYNC_AVAILABLE } from '../lib/firebase-config';
 
 export const GOALS: { v: Goal; l: string; d: string }[] = [
   { v: 'build_muscle', l: 'Build muscle', d: 'Gain size and strength with a small calorie surplus' },
@@ -28,6 +30,7 @@ const HOME_EQ: Equipment[] = ['dumbbell', 'bodyweight', 'bands'];
 
 export default function Onboarding() {
   const [step, setStep] = useState(0);
+  const cloud = useCloud();
   const [units, setUnits] = useState<'metric' | 'imperial'>('imperial');
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
@@ -92,6 +95,14 @@ export default function Onboarding() {
         {step === 0 && (
           <>
             <div><h1>Let's set you up</h1><p className="muted">This helps FitPilot personalise your training and nutrition. Everything stays on this device.</p></div>
+            {SYNC_AVAILABLE && (
+              <div className="card tight">
+                <div className="row between"><span className="small">Used FitPilot before?</span>
+                  <button className="btn sm" disabled={cloud.phase === 'connecting'} onClick={() => cloudSignIn()}>{cloud.phase === 'connecting' ? 'Restoring…' : 'Restore from Google'}</button></div>
+                {cloud.phase === 'synced' && <p className="tiny muted">Signed in as {cloud.email}. No backup found yet — set up below and it will be backed up automatically.</p>}
+                {cloud.error && <p className="tiny" style={{ color: 'var(--amber)' }}>{cloud.error}</p>}
+              </div>
+            )}
             <Seg value={units} onChange={setUnits} options={[{ v: 'imperial', l: 'lb / ft' }, { v: 'metric', l: 'kg / cm' }]} />
             <label className="field"><span>Name (optional)</span><input className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder="What should I call you?" /></label>
             <div className="grid2">

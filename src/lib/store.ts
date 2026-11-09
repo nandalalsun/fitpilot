@@ -34,6 +34,9 @@ function persist() {
 
 export const getState = () => state;
 
+/** Subscribe to every state change (used by cloud sync). */
+export function subscribe(fn: () => void) { listeners.add(fn); return () => { listeners.delete(fn); }; }
+
 /** Every mutation is written to storage immediately so progress survives the app closing mid-workout. */
 export function setState(fn: (s: AppState) => AppState) {
   const next = fn(state);
