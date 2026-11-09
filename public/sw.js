@@ -1,5 +1,5 @@
 // Minimal offline support: cache the app shell, network-first for navigation, cache-first for assets.
-const CACHE = 'fitpilot-v1';
+const CACHE = 'fitpilot-v2';
 self.addEventListener('install', (e) => { self.skipWaiting(); e.waitUntil(caches.open(CACHE).then((c) => c.addAll(['./', './index.html']))); });
 self.addEventListener('activate', (e) => { e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== CACHE).map((k) => caches.delete(k))))); self.clients.claim(); });
 self.addEventListener('fetch', (e) => {
