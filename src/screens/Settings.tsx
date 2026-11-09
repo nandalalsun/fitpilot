@@ -9,6 +9,8 @@ import { go } from '../ui/nav';
 import { DIETS, EQUIPMENT, EXPERIENCE, GOALS } from './Onboarding';
 import { requestNotificationPermission } from '../lib/reminders';
 
+const HOSTED = import.meta.env.VITE_HOSTED === '1';
+
 export default function Settings() {
   const state = useStore((s) => s);
   const p = state.profile!;
@@ -25,7 +27,9 @@ export default function Settings() {
   const suggested = computeTargets(p);
   const targetsDiffer = Math.abs(suggested.calories - p.targets.calories) > 50 || Math.abs(suggested.protein - p.targets.protein) > 5;
 
+  const [exportText, setExportText] = useState<string | null>(null);
   const download = () => {
+    if (HOSTED) { setExportText(exportData()); return; }
     const blob = new Blob([exportData()], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
@@ -96,7 +100,12 @@ export default function Settings() {
           )}
         </div>
 
-        <div className="card">
+        {HOSTED ? (
+          <div className="card">
+            <div className="label">AI coach & photo analysis</div>
+            <p className="small muted">This hosted preview runs fully on-device, so meal-photo analysis and open-ended AI answers are switched off. Everything else works. Run FitPilot from its own server to add an Anthropic API key.</p>
+          </div>
+        ) : <div className="card">
           <div className="label">AI coach & photo analysis</div>
           <p className="small muted">Everything works on-device without AI. Adding an Anthropic API key enables meal-photo analysis and open-ended coach answers. When used, a summary of your relevant data (or the meal photo) is sent to Anthropic's API — nothing else is shared, and the AI can't change your records without your confirmation.</p>
           <label className="field"><span>Anthropic API key</span>
@@ -107,7 +116,7 @@ export default function Settings() {
           </label>
           <p className="tiny dim">The key is stored only in this browser's local storage and is excluded from data exports.</p>
           {state.ai.apiKey && <button className="btn sm danger" onClick={() => { setKey(''); setState((s) => ({ ...s, ai: { ...s.ai, apiKey: '' } })); toast('API key removed'); }}>Remove key</button>}
-        </div>
+        </div>}
 
         <div className="card">
           <div className="label">Your data</div>
@@ -120,6 +129,13 @@ export default function Settings() {
         <p className="tiny dim" style={{ textAlign: 'center' }}>FitPilot provides general fitness guidance, not medical advice.</p>
       </div>
 
+      {exportText && (
+        <Sheet title="Export my data" onClose={() => setExportText(null)}>
+          <p className="small muted">Copy this JSON and keep it somewhere safe. You can paste it into a .json file to import it later.</p>
+          <textarea id="export-json" className="input" readOnly value={exportText} style={{ minHeight: 220, fontFamily: 'ui-monospace, monospace', fontSize: 12 }} onFocus={(e) => e.target.select()} />
+          <button className="btn primary block" onClick={() => { navigator.clipboard.writeText(exportText).then(() => toast('Copied to clipboard'), () => { (document.getElementById('export-json') as HTMLTextAreaElement | null)?.select(); toast('Select all and copy'); }); }}>Copy to clipboard</button>
+        </Sheet>
+      )}
       {targetsOpen && <TargetsSheet onClose={() => setTargetsOpen(false)} />}
       {confirmDelete && (
         <Sheet title="Delete everything?" onClose={() => setConfirmDelete(false)}>

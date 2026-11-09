@@ -45,7 +45,7 @@ export default function Coach() {
     const r = handleMessage(getState(), q);
     if (r.handled) { push({ role: 'coach', text: r.text, cards: r.cards.length ? r.cards : undefined }); return; }
     if (!ai.apiKey) {
-      push({ role: 'coach', text: "I'm not sure how to help with that one yet. I can log meals and workouts, adjust your schedule when you miss a session, suggest meals, recommend weight increases, and summarise your week.\n\nFor open-ended questions, add an Anthropic API key in Settings → AI coach." });
+      push({ role: 'coach', text: "I'm not sure how to help with that one yet. I can log meals and workouts, adjust your schedule when you miss a session, suggest meals, recommend weight increases, and summarise your week." + (import.meta.env.VITE_HOSTED === '1' ? '' : '\n\nFor open-ended questions, add an Anthropic API key in Settings → AI coach.') });
       return;
     }
     setThinking(true);
@@ -67,7 +67,7 @@ export default function Coach() {
   return (
     <>
       <div className="topbar">
-        <div><h1>Coach</h1><div className="sub">{ai.apiKey ? <><span className="badge ai">AI on</span> Open questions use Claude with a summary of your data</> : 'Runs on-device · add an AI key in Settings for open questions'}</div></div>
+        <div><h1>Coach</h1><div className="sub">{ai.apiKey ? <><span className="badge ai">AI on</span> Open questions use Claude with a summary of your data</> : import.meta.env.VITE_HOSTED === '1' ? 'Runs on-device' : 'Runs on-device · add an AI key in Settings for open questions'}</div></div>
         {chat.length > 1 && <button className="btn sm ghost" onClick={() => setState((s) => ({ ...s, chat: [] }))}>Clear</button>}
       </div>
       <div className="page" style={{ paddingBottom: 0 }}>

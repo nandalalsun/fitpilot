@@ -195,7 +195,7 @@ function PhotoLogger({ date, onClose, onDraft }: { date: string; onClose: () => 
           <p className="tiny dim"><span className="badge ai">AI</span> The photo is sent to Anthropic's Claude API for analysis. Results are estimates you review before saving.</p>
         </>
       ) : (
-        <div className="banner info">Photo analysis needs an AI key (Settings → AI). For now, describe what's on the plate above and FitPilot will estimate from its food database.
+        <div className="banner info">{import.meta.env.VITE_HOSTED === '1' ? 'AI photo analysis is off in this hosted preview.' : 'Photo analysis needs an AI key (Settings → AI).'} For now, describe what's on the plate above and FitPilot will estimate from its food database.
           <div className="row" style={{ marginTop: 8 }}><button className="btn sm primary" disabled={!hint.trim()} onClick={describeInstead}>Estimate from description</button></div>
         </div>
       )}
